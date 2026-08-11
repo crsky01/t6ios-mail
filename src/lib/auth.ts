@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || "t6mail_jwt_sec_k8x2m9p4r7v1n5";
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || process.env.JWT_SECRET || "t6mail_jwt_sec_k8x2m9p4r7v1n5";
 const SALT_ROUNDS = 10;
 
 export interface JwtPayload {
