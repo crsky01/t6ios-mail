@@ -43,13 +43,12 @@ export async function POST(request: Request) {
       isAdmin: users.is_admin,
       isAuthorized: users.is_authorized,
     });
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
+      token,
       user: { id: users.id, username: users.username, isAdmin: users.is_admin, isAuthorized: users.is_authorized },
       message: users.is_authorized ? "注册成功" : "账号已创建，等待审核"
     });
-    response.cookies.set("token", token, { httpOnly: true, maxAge: 604800, path: "/", sameSite: "lax" });
-    return response;
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "服务器错误" }, { status: 500 });
   }

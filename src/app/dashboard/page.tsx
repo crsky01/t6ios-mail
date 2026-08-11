@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
   const fetchMailboxes = useCallback(async () => {
     try {
-      const res = await fetch("/api/mailboxes");
+      const res = await fetch("/api/mailboxes", {headers:{"Authorization":"Bearer "+(localStorage.getItem("auth_token")||"")}});
       if (res.status === 401) { router.push("/login"); return; }
       const data = await res.json();
       setMailboxes(data.mailboxes || []);
@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   async function handleDelete(id: number) {
     setMailboxes(prev => prev.filter(m => m.id !== id));
-    await fetch(`/api/mailboxes?id=${id}`, { method: "DELETE" });
+    await fetch(`/api/mailboxes?id=${id}`, { method: "DELETE", headers:{"Authorization":"Bearer "+(localStorage.getItem("auth_token")||"")} });
   }
 
   function handleCopy(email: string) {

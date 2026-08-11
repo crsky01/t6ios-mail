@@ -16,7 +16,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/users")
+    fetch("/api/admin/users", {headers:{"Authorization":"Bearer "+(localStorage.getItem("auth_token")||"")}})
       .then(r => { if (r.status === 401 || r.status === 403) { router.push("/login"); return null; } return r.json(); })
       .then(data => { if (data) setUsers(data.users || []); })
       .catch(() => {})
