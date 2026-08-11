@@ -25,8 +25,10 @@ export async function POST(request: Request) {
   const user = getUser(request);
   if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
+  const body = await request.json().catch(() => ({}));
+  const prefix = (body.prefix || "").toLowerCase().replace(/[^a-z0-9._-]/g, "").substring(0, 20);
   const domain = process.env.NEXT_PUBLIC_DOMAIN || "t6ios.com";
-  const email = `${nanoid(8)}@${domain}`;
+  const email = prefix ? `${prefix}@${domain}` : `${nanoid(8)}@${domain}`;
 
   const sb = getSupabase();
   const { data, error } = await sb.from("mailboxes").insert({ email, user_id: user.userId }).select().single();

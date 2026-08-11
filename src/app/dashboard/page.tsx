@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [customPrefix, setCustomPrefix] = useState("");
 
   const fetchMailboxes = useCallback(async () => {
     try {
@@ -32,6 +33,23 @@ export default function DashboardPage() {
       const res = await fetch("/api/mailboxes", { method: "POST" });
       const data = await res.json();
       if (data.mailbox) setMailboxes(prev => [data.mailbox, ...prev]);
+    } catch { /* */ } finally { setGenerating(false); }
+  }
+
+  async function handleCustomGenerate() {
+    if (!customPrefix.trim()) return;
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/mailboxes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prefix: customPrefix.trim() }),
+      });
+      const data = await res.json();
+      if (data.mailbox) {
+        setMailboxes(prev => [data.mailbox, ...prev]);
+        setCustomPrefix("");
+      }
     } catch { /* */ } finally { setGenerating(false); }
   }
 
@@ -62,10 +80,25 @@ export default function DashboardPage() {
         {/* Generate */}
         <div className="card p-6 mb-6">
           <h2 className="text-[17px] font-semibold mb-1">生成邮箱</h2>
-          <p className="text-[14px] text-[#86868b] mb-4">点击创建新的 @t6ios.com 邮箱地址</p>
-          <button onClick={handleGenerate} disabled={generating} className="btn-primary">
-            {generating ? "生成中..." : "+ 生成新邮箱"}
-          </button>
+          <p className="text-[14px] text-[#86868b] mb-4">随机生成或自定义 @t6ios.com 邮箱地址</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button onClick={handleGenerate} disabled={generating} className="btn-primary">
+              {generating ? "生成中..." : "+ 随机生成"}
+            </button>
+            <div className="flex-1 flex gap-2">
+              <input
+                type="text"
+                value={customPrefix}
+                onChange={(e) => setCustomPrefix(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCustomGenerate()}
+                placeholder="自定义前缀..."
+                className="input-field flex-1"
+              />
+              <button onClick={handleCustomGenerate} disabled={generating || !customPrefix.trim()} className="btn-secondary whitespace-nowrap">
+                @t6ios.com
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Mailbox list */}
