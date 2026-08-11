@@ -2,23 +2,27 @@ import { Pool } from "pg";
 
 let pool: Pool | null = null;
 
+// Supabase Pooler connection — works from Vercel serverless
+const POOLER_HOST = "aws-0-us-east-1.pooler.supabase.com";
+const POOLER_PORT = 6543;
+const DB_NAME = "postgres";
+const DB_USER = "postgres.inooaqxhjkdezofapayi";
+
 export function getDb(): Pool {
   if (!pool) {
-    // Use Supabase Pooler (port 6543) for serverless compatibility
+    // Use DATABASE_URL if provided, otherwise use pooler with password from env
     const dbUrl = process.env.DATABASE_URL;
     if (dbUrl) {
-      pool = new Pool({
-        connectionString: dbUrl,
-        ssl: { rejectUnauthorized: false },
-      });
+      pool = new Pool({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
     } else {
       pool = new Pool({
-        host: process.env.DATABASE_HOST || "aws-0-us-east-1.pooler.supabase.com",
-        port: parseInt(process.env.DATABASE_PORT || "6543"),
-        database: process.env.DATABASE_NAME || "postgres",
-        user: process.env.DATABASE_USER || "postgres.inooaqxhjkdezofapayi",
-        password: process.env.DATABASE_PASSWORD,
+        host: POOLER_HOST,
+        port: POOLER_PORT,
+        database: DB_NAME,
+        user: DB_USER,
+        password: process.env.DATABASE_PASSWORD || "",
         ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: 10000,
       });
     }
   }
