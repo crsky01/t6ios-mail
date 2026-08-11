@@ -24,7 +24,7 @@ export default function LoginPage() {
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("auth_user", JSON.stringify(data.user));
         document.cookie = "token=" + data.token + "; path=/; max-age=604800; SameSite=Lax";
-        router.push(data.user.isAdmin ? "/admin" : "/dashboard");
+        window.location.href = data.user.isAdmin ? "/admin" : "/dashboard");
       } else {
         setError(data.error || "登录失败");
       }
@@ -51,7 +51,7 @@ export default function LoginPage() {
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("auth_user", JSON.stringify(data.user));
         document.cookie = "token=" + data.token + "; path=/; max-age=604800; SameSite=Lax";
-        router.push(data.user.isAuthorized ? "/dashboard" : "/pending");
+        window.location.href = data.user.isAuthorized ? "/dashboard" : "/pending");
       } else {
         setError(data.error || "注册失败");
       }
