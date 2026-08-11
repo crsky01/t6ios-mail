@@ -1,57 +1,50 @@
+// @ts-nocheck
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getSupabase } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 
-// GET /api/inbox/[mailboxId] - list emails for a mailbox
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const token = request.headers.get("Authorization")?.replace("Bearer ", "") ||
     request.headers.get("cookie")?.match(/token=([^;]+)/)?.[1];
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!token) return NextResponse.json({ error: "请先登录" }, { status: 401 });
   const user = verifyToken(token);
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
   const { id } = await params;
-  const db = getDb();
+  const sb = getSupabase();
 
-  // Verify user owns this mailbox or is admin
-  const mb = await db.query("SELECT * FROM mailboxes WHERE id = $1", [id]);
-  if (mb.rows.length === 0) {
-    return NextResponse.json({ error: "Mailbox not found" }, { status: 404 });
-  }
-  if (mb.rows[0].user_id !== user.userId && !user.isAdmin) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const { data: mailbox } = await sb.from("mailboxes").select("*").eq("id", id).single();
+  if (!mailbox) return NextResponse.json({ error: "邮箱不存在" }, { status: 404 });
+  if (mailbox.user_id !== user.userId && !user.isAdmin) {
+    return NextResponse.json({ error: "无权访问" }, { status: 403 });
   }
 
-  const emails = await db.query(
-    "SELECT * FROM emails WHERE mailbox_id = $1 ORDER BY created_at DESC LIMIT 100",
-    [id]
-  );
-  return NextResponse.json({ mailbox: mb.rows[0], emails: emails.rows });
+  const { data: emails } = await sb.from("emails").select("*").eq("mailbox_id", id).order("created_at", { ascending: false }).limit(100);
+  return NextResponse.json({ mailbox, emails: emails || [] });
 }
 
-// PATCH - mark email as read
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const token = request.headers.get("Authorization")?.replace("Bearer ", "") ||
     request.headers.get("cookie")?.match(/token=([^;]+)/)?.[1];
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!token) return NextResponse.json({ error: "请先登录" }, { status: 401 });
   const user = verifyToken(token);
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
   const { id } = await params;
   const { emailId } = await request.json();
+  const sb = getSupabase();
 
-  const db = getDb();
-  const mb = await db.query("SELECT * FROM mailboxes WHERE id = $1", [id]);
-  if (mb.rows.length === 0 || (mb.rows[0].user_id !== user.userId && !user.isAdmin)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const { data: mailbox } = await sb.from("mailboxes").select("*").eq("id", id).single();
+  if (!mailbox || (mailbox.user_id !== user.userId && !user.isAdmin)) {
+    return NextResponse.json({ error: "无权操作" }, { status: 403 });
   }
 
-  await db.query("UPDATE emails SET is_read = true WHERE id = $1 AND mailbox_id = $2", [emailId, id]);
+  await sb.from("emails").update({ is_read: true }).eq("id", emailId).eq("mailbox_id", id);
   return NextResponse.json({ success: true });
 }

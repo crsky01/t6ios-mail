@@ -1,30 +1,16 @@
-import { Pool } from "pg";
+import { createClient } from "@supabase/supabase-js";
 
-let pool: Pool | null = null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://inooaqxhjkdezofapayi.supabase.co";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlub29hcXhoamtkZXpvZmFwYXlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MDk4MjIsImV4cCI6MjA2NTI4NTgyMn0.sb_publishable_oMbUZFXS8V1bi15bh_fzBQ_o_Z2HkB7";
 
-// Supabase Pooler connection (port 6543) — works from Vercel serverless
-const POOLER_HOST = "db.inooaqxhjkdezofapayi.supabase.co";
-const POOLER_PORT = 6543;
-const DB_NAME = "postgres";
-const DB_USER = "postgres";
+let client: ReturnType<typeof createClient> | null = null;
 
-export function getDb(): Pool {
-  if (!pool) {
-    // Use DATABASE_URL if provided, otherwise use pooler with password from env
-    const dbUrl = process.env.DATABASE_URL;
-    if (dbUrl) {
-      pool = new Pool({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
-    } else {
-      pool = new Pool({
-        host: POOLER_HOST,
-        port: POOLER_PORT,
-        database: DB_NAME,
-        user: DB_USER,
-        password: process.env.DATABASE_PASSWORD || "",
-        ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 10000,
-      });
-    }
+export function getSupabase() {
+  if (!client) {
+    client = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
   }
-  return pool;
+  return client;
 }
+
+// Also export for direct use
+export const supabase = () => getSupabase();
