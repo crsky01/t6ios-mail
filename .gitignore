@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 push.sh\nvercel.env\ninit-admin.js\ninit-db.js\n.env.local
+push.sh
+vercel.env
+init-admin.js
+init-db.js

@@ -12,8 +12,8 @@ interface Mailbox {
 export default function DashboardPage() {
   const router = useRouter();
   const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
-  const [loading, set加载中... useState(true);
-  const [generating, set生成中... useState(false);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
 
   const fetchMailboxes = useCallback(async () => {
     try {
@@ -21,18 +21,18 @@ export default function DashboardPage() {
       if (res.status === 401) { router.push("/login"); return; }
       const data = await res.json();
       setMailboxes(data.mailboxes || []);
-    } catch { /* */ } finally { set加载中...lse); }
+    } catch { /* */ } finally { setLoading(false); }
   }, [router]);
 
   useEffect(() => { fetchMailboxes(); }, [fetchMailboxes]);
 
   async function handleGenerate() {
-    set生成中...ue);
+    setGenerating(true);
     try {
       const res = await fetch("/api/mailboxes", { method: "POST" });
       const data = await res.json();
       if (data.mailbox) setMailboxes(prev => [data.mailbox, ...prev]);
-    } catch { /* */ } finally { set生成中...lse); }
+    } catch { /* */ } finally { setGenerating(false); }
   }
 
   async function handleDelete(id: number) {

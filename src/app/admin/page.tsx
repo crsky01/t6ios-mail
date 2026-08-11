@@ -13,14 +13,14 @@ interface User {
 export default function AdminPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, set加载中... useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/users")
       .then(r => { if (r.status === 401 || r.status === 403) { router.push("/login"); return null; } return r.json(); })
       .then(data => { if (data) setUsers(data.users || []); })
       .catch(() => {})
-      .finally(() => set加载中...lse));
+      .finally(() => setLoading(false));
   }, [router]);
 
   async function toggleAuth(userId: number, authorized: boolean) {

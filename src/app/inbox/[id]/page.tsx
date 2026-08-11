@@ -26,7 +26,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
   const [mailbox, setMailbox] = useState<MailboxData | null>(null);
   const [emails, setEmails] = useState<Email[]>([]);
   const [selected, setSelected] = useState<Email | null>(null);
-  const [loading, set加载中... useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/inbox/${id}`)
@@ -41,7 +41,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
         }
       })
       .catch(() => {})
-      .finally(() => set加载中...lse));
+      .finally(() => setLoading(false));
   }, [id, router]);
 
   // Auto-refresh every 15 seconds
