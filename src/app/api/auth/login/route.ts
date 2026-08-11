@@ -25,11 +25,13 @@ export async function POST(request: Request) {
       isAdmin: user.is_admin,
       isAuthorized: user.is_authorized,
     });
-    return NextResponse.json({
+    const resp = NextResponse.json({
       success: true,
       token,
       user: { id: user.id, username: user.username, isAdmin: user.is_admin, isAuthorized: user.is_authorized }
     });
+    resp.cookies.set("token", token, { path: "/", maxAge: 604800, sameSite: "lax" });
+    return resp;
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "服务器错误" }, { status: 500 });
   }
