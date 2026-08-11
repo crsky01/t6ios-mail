@@ -3,19 +3,20 @@ import { getDb } from "@/lib/db";
 import { hashPassword, signToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  try {
   const { username, password } = await request.json();
   if (!username || !password) {
-    return NextResponse.json({ error: "Username and password required" }, { status: 400 });
+    return NextResponse.json({ error: "用户名和密码必填" }, { status: 400 });
   }
   if (password.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    return NextResponse.json({ error: "密码至少6位" }, { status: 400 });
   }
   const db = getDb();
 
   // Check if user exists
   const existing = await db.query("SELECT id FROM users WHERE username = $1", [username]);
   if (existing.rows.length > 0) {
-    return NextResponse.json({ error: "Username already exists" }, { status: 409 });
+    return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
   }
 
   const passwordHash = await hashPassword(password);
@@ -46,4 +47,7 @@ export async function POST(request: Request) {
   });
   response.cookies.set("token", token, { httpOnly: true, maxAge: 604800, path: "/", sameSite: "lax" });
   return response;
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "服务器错误" }, { status: 500 });
+  }
 }
