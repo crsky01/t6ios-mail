@@ -2,11 +2,11 @@ import { Pool } from "pg";
 
 let pool: Pool | null = null;
 
-// Supabase Pooler connection — works from Vercel serverless
-const POOLER_HOST = "aws-0-us-east-1.pooler.supabase.com";
+// Supabase Pooler connection (port 6543) — works from Vercel serverless
+const POOLER_HOST = "db.inooaqxhjkdezofapayi.supabase.co";
 const POOLER_PORT = 6543;
 const DB_NAME = "postgres";
-const DB_USER = "postgres.inooaqxhjkdezofapayi";
+const DB_USER = "postgres";
 
 export function getDb(): Pool {
   if (!pool) {
