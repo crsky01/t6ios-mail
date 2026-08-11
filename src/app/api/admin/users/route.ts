@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   if (!user?.isAdmin) return NextResponse.json({ error: "无权访问" }, { status: 403 });
 
   const sb = getSupabase();
-  const { data } = await sb.from("users").select("id,username,is_authorized,is_admin,created_at").order("created_at", { ascending: false });
+  const { data } = await sb.from("app_users").select("id,username,is_authorized,is_admin,created_at").order("created_at", { ascending: false });
   return NextResponse.json({ users: data || [] });
 }
 
@@ -27,6 +27,6 @@ export async function PATCH(request: Request) {
   if (typeof userId === "undefined") return NextResponse.json({ error: "缺少参数" }, { status: 400 });
 
   const sb = getSupabase();
-  await sb.from("users").update({ is_authorized }).eq("id", userId);
+  await sb.from("app_users").update({ is_authorized }).eq("id", userId);
   return NextResponse.json({ success: true });
 }

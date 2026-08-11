@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "用户名和密码必填" }, { status: 400 });
     }
     const sb = getSupabase();
-    const { data: users, error } = await sb.from("users").select("*").eq("username", username).limit(1);
+    const { data: users, error } = await sb.from("app_users").select("*").eq("username", username).limit(1);
     if (error || !users || users.length === 0) {
       return NextResponse.json({ error: "账号或密码错误" }, { status: 401 });
     }

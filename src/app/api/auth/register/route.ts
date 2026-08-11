@@ -14,13 +14,13 @@ export async function POST(request: Request) {
     }
     const sb = getSupabase();
 
-    const { data: existing } = await sb.from("users").select("id").eq("username", username).limit(1);
+    const { data: existing } = await sb.from("app_users").select("id").eq("username", username).limit(1);
     if (existing && existing.length > 0) {
       return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
     }
 
     const passwordHash = await hashPassword(password);
-    const { data: users, error } = await sb.from("users").insert({
+    const { data: users, error } = await sb.from("app_users").insert({
       username,
       password_hash: passwordHash,
     }).select().single();
@@ -30,9 +30,9 @@ export async function POST(request: Request) {
     }
 
     // First user gets admin
-    const { count } = await sb.from("users").select("*", { count: "exact", head: true });
+    const { count } = await sb.from("app_users").select("*", { count: "exact", head: true });
     if (count === 1) {
-      await sb.from("users").update({ is_admin: true, is_authorized: true }).eq("id", users.id);
+      await sb.from("app_users").update({ is_admin: true, is_authorized: true }).eq("id", users.id);
       users.is_admin = true;
       users.is_authorized = true;
     }
