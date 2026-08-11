@@ -13,14 +13,14 @@ interface User {
 export default function AdminPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, set加载中... useState(true);
 
   useEffect(() => {
     fetch("/api/admin/users")
       .then(r => { if (r.status === 401 || r.status === 403) { router.push("/login"); return null; } return r.json(); })
       .then(data => { if (data) setUsers(data.users || []); })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => set加载中...lse));
   }, [router]);
 
   async function toggleAuth(userId: number, authorized: boolean) {
@@ -36,24 +36,24 @@ export default function AdminPage() {
     <main className="min-h-screen bg-[#f5f5f7]">
       <header className="bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/50 sticky top-0 z-10">
         <div className="max-w-[900px] mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-[20px] font-bold text-[#1d1d1f]">Admin Panel</h1>
+          <h1 className="text-[20px] font-bold text-[#1d1d1f]">管理面板</h1>
           <button
             onClick={() => { document.cookie = "token=; Max-Age=0; path=/"; router.push("/login"); }}
             className="text-[14px] text-[#86868b] hover:text-[#1d1d1f]"
           >
-            Sign Out
+            退出登录
           </button>
         </div>
       </header>
 
       <div className="max-w-[900px] mx-auto px-4 py-8">
         <div className="card p-6 mb-6">
-          <h2 className="text-[17px] font-semibold mb-1">User Management</h2>
-          <p className="text-[14px] text-[#86868b]">Authorize users to view email inboxes</p>
+          <h2 className="text-[17px] font-semibold mb-1">用户管理</h2>
+          <p className="text-[14px] text-[#86868b]">授权用户查看收件箱</p>
         </div>
 
         {loading ? (
-          <div className="text-center py-10 text-[#86868b]">Loading...</div>
+          <div className="text-center py-10 text-[#86868b]">加载中...</div>
         ) : (
           <div className="space-y-2">
             {users.map(u => (
@@ -61,15 +61,15 @@ export default function AdminPage() {
                 <div>
                   <div className="text-[15px] font-medium text-[#1d1d1f]">
                     {u.username}
-                    {u.is_admin && <span className="tag tag-green ml-2">Admin</span>}
+                    {u.is_admin && <span className="tag tag-green ml-2">管理员</span>}
                   </div>
                   <div className="text-[12px] text-[#86868b]">
-                    Joined {new Date(u.created_at).toLocaleDateString()}
+                    注册于 {new Date(u.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`tag ${u.is_authorized ? "tag-green" : "tag-yellow"}`}>
-                    {u.is_authorized ? "Authorized" : "Pending"}
+                    {u.is_authorized ? "已授权" : "待审核"}
                   </span>
                   {!u.is_admin && (
                     <button
@@ -80,7 +80,7 @@ export default function AdminPage() {
                           : "bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20"
                       }`}
                     >
-                      {u.is_authorized ? "Revoke" : "Authorize"}
+                      {u.is_authorized ? "撤销" : "授权"}
                     </button>
                   )}
                 </div>

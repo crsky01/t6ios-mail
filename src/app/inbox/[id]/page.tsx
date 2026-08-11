@@ -26,7 +26,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
   const [mailbox, setMailbox] = useState<MailboxData | null>(null);
   const [emails, setEmails] = useState<Email[]>([]);
   const [selected, setSelected] = useState<Email | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, set加载中... useState(true);
 
   useEffect(() => {
     fetch(`/api/inbox/${id}`)
@@ -41,7 +41,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
         }
       })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => set加载中...lse));
   }, [id, router]);
 
   // Auto-refresh every 15 seconds
@@ -69,10 +69,10 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
       <header className="bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/50 sticky top-0 z-10">
         <div className="max-w-[720px] mx-auto px-6 py-4 flex items-center justify-between">
           <button onClick={() => router.push("/dashboard")} className="text-[15px] text-[#86868b] hover:text-[#1d1d1f]">
-            ← Back
+            ← 返回
           </button>
           <h1 className="text-[17px] font-semibold text-[#1d1d1f] truncate max-w-[300px]">
-            {mailbox?.email || "Inbox"}
+            {mailbox?.email || "收件箱"}
           </h1>
           <div className="w-12" />
         </div>
@@ -83,7 +83,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
           <div className="card mb-4 flex items-center justify-between">
             <div>
               <div className="text-[15px] font-mono font-medium">{mailbox.email}</div>
-              <div className="text-[12px] text-[#86868b]">{emails.length} messages</div>
+              <div className="text-[12px] text-[#86868b]">{emails.length} 封邮件</div>
             </div>
             <button
               onClick={() => { navigator.clipboard.writeText(mailbox.email); }}
@@ -97,7 +97,7 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
         {selected ? (
           <div className="card p-5 animate-in">
             <button onClick={() => setSelected(null)} className="text-[14px] text-[#86868b] hover:text-[#1d1d1f] mb-4">
-              ← Back to list
+              ← 返回 to list
             </button>
             <div className="text-[11px] text-[#86868b] mb-1">{selected.from_address}</div>
             <h2 className="text-[17px] font-semibold mb-1">{selected.subject}</h2>
@@ -107,19 +107,19 @@ export default function InboxPage({ params }: { params: Promise<{ id: string }> 
                 <div className="prose text-[15px] leading-relaxed" dangerouslySetInnerHTML={{ __html: selected.body_html }} />
               ) : (
                 <pre className="text-[15px] leading-relaxed whitespace-pre-wrap font-sans text-[#1d1d1f]">
-                  {selected.body_text || "(No content)"}
+                  {selected.body_text || "（无内容）"}
                 </pre>
               )}
             </div>
           </div>
         ) : loading ? (
-          <div className="text-center py-10 text-[#86868b]">Loading...</div>
+          <div className="text-center py-10 text-[#86868b]">加载中...</div>
         ) : emails.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-[40px] mb-3 opacity-30">📭</div>
-            <p className="text-[15px] text-[#86868b]">Inbox is empty</p>
+            <p className="text-[15px] text-[#86868b]">收件箱为空</p>
             <p className="text-[13px] text-[#86868b] mt-1">
-              Waiting for emails to {mailbox?.email}
+              等待邮件发送到 {mailbox?.email}
             </p>
           </div>
         ) : (

@@ -13,18 +13,18 @@ export default function Home() {
         </div>
 
         <h1 className="text-[40px] sm:text-[48px] font-bold tracking-tight text-[#1d1d1f] leading-[1.1] mb-4">
-          Free Temporary Email
+          免费临时邮箱
         </h1>
         <p className="text-[17px] text-[#86868b] leading-relaxed mb-2 max-w-md mx-auto">
-          Generate unlimited email addresses instantly.
+          无限生成邮箱地址，即开即用
         </p>
         <p className="text-[15px] text-[#86868b] mb-10">
-          Protect your privacy. No registration spam. All emails @t6ios.com
+          保护您的隐私，远离垃圾邮件。所有邮箱后缀 @t6ios.com
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link href="/login" className="btn-primary px-8 py-3.5 text-[16px]">
-            Get Started
+            立即开始
           </Link>
           <Link href="/login" className="btn-secondary px-8 py-3.5 text-[16px]">
             Sign In
@@ -33,7 +33,7 @@ export default function Home() {
       </section>
 
       <footer className="text-center py-8 text-[12px] text-[#86868b] border-t border-[#d2d2d7]/50">
-        T6 Mail · t6ios.com
+        T6 邮箱 · t6ios.com
       </footer>
     </main>
   );

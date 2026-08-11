@@ -12,8 +12,8 @@ interface Mailbox {
 export default function DashboardPage() {
   const router = useRouter();
   const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
+  const [loading, set加载中... useState(true);
+  const [generating, set生成中... useState(false);
 
   const fetchMailboxes = useCallback(async () => {
     try {
@@ -21,18 +21,18 @@ export default function DashboardPage() {
       if (res.status === 401) { router.push("/login"); return; }
       const data = await res.json();
       setMailboxes(data.mailboxes || []);
-    } catch { /* */ } finally { setLoading(false); }
+    } catch { /* */ } finally { set加载中...lse); }
   }, [router]);
 
   useEffect(() => { fetchMailboxes(); }, [fetchMailboxes]);
 
   async function handleGenerate() {
-    setGenerating(true);
+    set生成中...ue);
     try {
       const res = await fetch("/api/mailboxes", { method: "POST" });
       const data = await res.json();
       if (data.mailbox) setMailboxes(prev => [data.mailbox, ...prev]);
-    } catch { /* */ } finally { setGenerating(false); }
+    } catch { /* */ } finally { set生成中...lse); }
   }
 
   async function handleDelete(id: number) {
@@ -48,12 +48,12 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-[#f5f5f7]">
       <header className="bg-white/80 backdrop-blur-xl border-b border-[#d2d2d7]/50 sticky top-0 z-10">
         <div className="max-w-[720px] mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-[20px] font-bold text-[#1d1d1f]">T6 Mail</h1>
+          <h1 className="text-[20px] font-bold text-[#1d1d1f]">T6 邮箱</h1>
           <button
             onClick={() => { document.cookie = "token=; Max-Age=0; path=/"; router.push("/login"); }}
             className="text-[14px] text-[#86868b] hover:text-[#1d1d1f]"
           >
-            Sign Out
+            退出登录
           </button>
         </div>
       </header>
@@ -61,21 +61,21 @@ export default function DashboardPage() {
       <div className="max-w-[720px] mx-auto px-4 py-8">
         {/* Generate */}
         <div className="card p-6 mb-6">
-          <h2 className="text-[17px] font-semibold mb-1">Generate Email</h2>
-          <p className="text-[14px] text-[#86868b] mb-4">Click to create a new @t6ios.com address</p>
+          <h2 className="text-[17px] font-semibold mb-1">生成邮箱</h2>
+          <p className="text-[14px] text-[#86868b] mb-4">点击创建新的 @t6ios.com 邮箱地址</p>
           <button onClick={handleGenerate} disabled={generating} className="btn-primary">
-            {generating ? "Generating..." : "+ Generate New Email"}
+            {generating ? "生成中..." : "+ 生成新邮箱"}
           </button>
         </div>
 
         {/* Mailbox list */}
         {loading ? (
-          <div className="text-center py-10 text-[#86868b]">Loading...</div>
+          <div className="text-center py-10 text-[#86868b]">加载中...</div>
         ) : mailboxes.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-[40px] mb-3 opacity-30">📧</div>
-            <p className="text-[15px] text-[#86868b]">No email addresses yet</p>
-            <p className="text-[13px] text-[#86868b]">Generate your first one above</p>
+            <p className="text-[15px] text-[#86868b]">还没有邮箱地址</p>
+            <p className="text-[13px] text-[#86868b]">点击上方按钮生成第一个</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -84,7 +84,7 @@ export default function DashboardPage() {
                 <div>
                   <div className="text-[15px] font-mono font-medium text-[#1d1d1f]">{mb.email}</div>
                   <div className="text-[12px] text-[#86868b]">
-                    {new Date(mb.created_at).toLocaleString()} · {mb.is_active ? "Active" : "Inactive"}
+                    {new Date(mb.created_at).toLocaleString()} · {mb.is_active ? "可用" : "已停用"}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function DashboardPage() {
                     Copy
                   </button>
                   <button onClick={() => router.push(`/inbox/${mb.id}`)} className="px-3 py-1.5 text-[12px] rounded-full bg-[#0071e3] text-white hover:bg-[#0066d6]">
-                    Inbox →
+                    收件箱 →
                   </button>
                   <button onClick={() => handleDelete(mb.id)} className="px-3 py-1.5 text-[12px] rounded-full text-[#ff3b30] hover:bg-[#ff3b30]/5">
                     Delete

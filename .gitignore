@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+push.sh\nvercel.env\ninit-admin.js\ninit-db.js\n.env.local
