@@ -16,9 +16,32 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
   const sb = getSupabase();
-  const { data, error } = await sb.from("mailboxes").select("*").eq("user_id", user.userId).order("created_at", { ascending: false });
+  const { data: mbs, error } = await sb.from("mailboxes").select("*").eq("user_id", user.userId).order("created_at", { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ mailboxes: data || [] });
+
+  // Enrich each mailbox with unread count + latest unread email
+  const mailboxes = await Promise.all((mbs || []).map(async (mb) => {
+    const { count } = await sb.from("emails").select("*", { count: "exact", head: true }).eq("mailbox_id", mb.id).eq("is_read", false);
+    let latestEmail = null;
+    if (count && count > 0) {
+      const { data: latest } = await sb.from("emails").select("id,from_address,subject,body_text,created_at,is_read").eq("mailbox_id", mb.id).eq("is_read", false).order("created_at", { ascending: false }).limit(1).single();
+      latestEmail = latest;
+    }
+    return { ...mb, unread: count || 0, latestEmail };
+  }));
+
+  // Also get the single most recent unread email across all mailboxes
+  let topUnread = null;
+  const mailboxIds = (mbs || []).map(m => m.id);
+  if (mailboxIds.length > 0) {
+    const { data: latest } = await sb.from("emails").select("id,from_address,subject,body_text,body_html,created_at,is_read,mailbox_id").in("mailbox_id", mailboxIds).eq("is_read", false).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (latest) {
+      const mb = (mbs || []).find(m => m.id === latest.mailbox_id);
+      topUnread = { ...latest, mailbox_email: mb?.email || "" };
+    }
+  }
+
+  return NextResponse.json({ mailboxes, topUnread });
 }
 
 export async function POST(request: Request) {
