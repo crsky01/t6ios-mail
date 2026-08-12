@@ -43,12 +43,12 @@ export default function AdminPage() {
   const [pwValue, setPwValue] = useState("");
   const [pwMsg, setPwMsg] = useState("");
 
-  const headers = { "Authorization": "Bearer " + (localStorage.getItem("auth_token") || ""), "Content-Type": "application/json" };
+  function getHeaders() { return { "Authorization": "Bearer " + (localStorage.getItem("auth_token") || ""), "Content-Type": "application/json" }; }
 
   function fetchData() {
     Promise.all([
-      fetch("/api/admin/users", { headers }).then(r => r.json()),
-      fetch("/api/admin/emails", { headers }).then(r => r.json()),
+      fetch("/api/admin/users", { headers: getHeaders() }).then(r => r.json()),
+      fetch("/api/admin/emails", { headers: getHeaders() }).then(r => r.json()),
     ]).then(([userData, emailData]) => {
       if (userData.users) setUsers(userData.users);
       if (emailData.emails) {
@@ -62,14 +62,14 @@ export default function AdminPage() {
   useEffect(() => { fetchData(); }, []);
 
   async function toggleAuth(userId: number, authorized: boolean) {
-    await fetch("/api/admin/users", { method: "PATCH", headers, body: JSON.stringify({ userId, is_authorized: authorized }) });
+    await fetch("/api/admin/users", { method: "PATCH", headers: getHeaders(), body: JSON.stringify({ userId, is_authorized: authorized }) });
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_authorized: authorized } : u));
   }
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
     setCreateMsg("");
-    const res = await fetch("/api/admin/users", { method: "POST", headers, body: JSON.stringify({ username: newUsername, password: newPassword }) });
+    const res = await fetch("/api/admin/users", { method: "POST", headers: getHeaders(), body: JSON.stringify({ username: newUsername, password: newPassword }) });
     const data = await res.json();
     if (data.user) {
       setUsers(prev => [data.user, ...prev]);
@@ -84,7 +84,7 @@ export default function AdminPage() {
     e.preventDefault();
     if (!pwModal) return;
     setPwMsg("");
-    const res = await fetch("/api/admin/users", { method: "PUT", headers, body: JSON.stringify({ userId: pwModal.userId, newPassword: pwValue }) });
+    const res = await fetch("/api/admin/users", { method: "PUT", headers: getHeaders(), body: JSON.stringify({ userId: pwModal.userId, newPassword: pwValue }) });
     const data = await res.json();
     if (data.success) {
       setPwModal(null); setPwValue(""); setPwMsg("");
