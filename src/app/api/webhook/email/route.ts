@@ -80,8 +80,13 @@ export async function POST(request: Request) {
   }
 
   const sb = getSupabase();
-  const { data: mb } = await sb.from("mailboxes").select("id").eq("email", recipient).eq("is_active", true).single();
-  if (!mb) return NextResponse.json({ received: false }, { status: 200 });
+  let { data: mb } = await sb.from("mailboxes").select("id").eq("email", recipient).eq("is_active", true).single();
+  // If no matching mailbox, fall back to catch-all (for admin)
+  if (!mb) {
+    const { data: catchAll } = await sb.from("mailboxes").select("id").eq("email", "*@t6ios.com").eq("is_active", true).single();
+    if (!catchAll) return NextResponse.json({ received: false }, { status: 200 });
+    mb = catchAll;
+  }
 
   await sb.from("emails").insert({
     mailbox_id: mb.id, from_address: from, to_address: recipient,
