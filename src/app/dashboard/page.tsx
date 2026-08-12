@@ -30,6 +30,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [customPrefix, setCustomPrefix] = useState("");
+  const [showChangePwd, setShowChangePwd] = useState(false);
+  const [oldPwd, setOldPwd] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [pwdError, setPwdError] = useState("");
+  const [pwdOk, setPwdOk] = useState(false);
 
   const fetchMailboxes = useCallback(async () => {
     try {
@@ -84,6 +89,19 @@ export default function DashboardPage() {
     navigator.clipboard.writeText(email);
   }
 
+  async function handleChangePwd() {
+    setPwdError(""); setPwdOk(false);
+    const res = await fetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + (localStorage.getItem("auth_token") || "") },
+      body: JSON.stringify({ oldPassword: oldPwd, newPassword: newPwd }),
+    });
+    const data = await res.json();
+    if (data.error) { setPwdError(data.error); return; }
+    setPwdOk(true);
+    setTimeout(() => { setShowChangePwd(false); setOldPwd(""); setNewPwd(""); setPwdError(""); setPwdOk(false); }, 1500);
+  }
+
   const totalUnread = mailboxes.reduce((sum, mb) => sum + (mb.unread || 0), 0);
 
   return (
@@ -98,12 +116,20 @@ export default function DashboardPage() {
               </span>
             )}
           </div>
-          <button
-            onClick={() => { document.cookie = "token=; Max-Age=0; path=/"; router.push("/login"); }}
-            className="text-[14px] text-[#86868b] hover:text-[#1d1d1f]"
-          >
-            退出登录
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowChangePwd(true)}
+              className="text-[14px] text-[#86868b] hover:text-[#1d1d1f]"
+            >
+              修改密码
+            </button>
+            <button
+              onClick={() => { document.cookie = "token=; Max-Age=0; path=/"; router.push("/login"); }}
+              className="text-[14px] text-[#86868b] hover:text-[#1d1d1f]"
+            >
+              退出登录
+            </button>
+          </div>
         </div>
       </header>
 
@@ -256,6 +282,28 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Change Password Modal */}
+      {showChangePwd && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowChangePwd(false)}>
+          <div className="card p-6 w-[340px] bg-white shadow-xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-[16px] font-semibold mb-4">修改密码</h3>
+            {pwdOk ? (
+              <div className="text-center py-4"><div className="text-[24px] mb-2">✅</div><p className="text-[14px] text-[#34c759]">密码修改成功</p></div>
+            ) : (
+              <>
+                <input type="password" value={oldPwd} onChange={e => setOldPwd(e.target.value)} placeholder="原密码" className="input-field mb-3" />
+                <input type="password" value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="新密码（至少4位）" className="input-field mb-3" />
+                {pwdError && <p className="text-[13px] text-[#ff3b30] mb-3">{pwdError}</p>}
+                <div className="flex gap-2">
+                  <button onClick={() => setShowChangePwd(false)} className="btn-secondary flex-1">取消</button>
+                  <button onClick={handleChangePwd} disabled={!oldPwd || !newPwd} className="btn-primary flex-1">确认</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
