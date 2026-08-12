@@ -108,58 +108,69 @@ export default function DashboardPage() {
       </header>
 
       <div className="max-w-[720px] mx-auto px-4 py-8">
-        {/* ===== TOP: Latest unread email preview ===== */}
-        {topUnread && (
-          <div className="mb-6">
-            <div className="text-[12px] uppercase tracking-wide text-[#86868b] mb-2 font-medium">
-              最新未读邮件
-            </div>
-            <div className="card overflow-hidden border-[#0071e3]/20 bg-gradient-to-b from-[#0071e3]/3 to-white">
-              {/* Email header */}
-              <div className="px-5 pt-4 pb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-2 h-2 rounded-full bg-[#0071e3] shrink-0 animate-pulse" />
-                  <span className="text-[13px] font-medium text-[#86868b] truncate">
-                    收件箱：{topUnread.mailbox_email}
+        {/* ===== TOP: Latest email preview (always visible) ===== */}
+        <div className="mb-6">
+          <div className="text-[12px] uppercase tracking-wide text-[#86868b] mb-2 font-medium">
+            最新邮件
+          </div>
+          <div className="card overflow-hidden border-[#0071e3]/20 bg-gradient-to-b from-[#0071e3]/3 to-white">
+            {topUnread ? (
+              <>
+                {/* Email header */}
+                <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {topUnread.is_read ? null : <div className="w-2 h-2 rounded-full bg-[#0071e3] shrink-0 animate-pulse" />}
+                    <span className="text-[13px] font-medium text-[#86868b] truncate">
+                      收件箱：{topUnread.mailbox_email}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#86868b] shrink-0 ml-2">
+                    {new Date(topUnread.created_at).toLocaleString()}
                   </span>
                 </div>
-                <span className="text-[11px] text-[#86868b] shrink-0 ml-2">
-                  {new Date(topUnread.created_at).toLocaleString()}
-                </span>
-              </div>
-              <div className="px-5 pb-1">
-                <div className="text-[13px] text-[#86868b]">{topUnread.from_address}</div>
-                <h2 className="text-[16px] font-semibold text-[#1d1d1f] mt-0.5">
-                  {topUnread.subject}
-                </h2>
-              </div>
-              {/* Email body preview */}
-              <div className="px-5 pb-4 pt-2">
-                <div className="border-t border-[#d2d2d7]/30 pt-3">
-                  {topUnread.body_html ? (
-                    <div
-                      className="text-[14px] leading-relaxed text-[#1d1d1f] max-h-[200px] overflow-y-auto prose prose-sm"
-                      dangerouslySetInnerHTML={{ __html: topUnread.body_html }}
-                    />
-                  ) : (
-                    <pre className="text-[14px] leading-relaxed text-[#1d1d1f] whitespace-pre-wrap font-sans max-h-[200px] overflow-y-auto">
-                      {topUnread.body_text || "（无内容）"}
-                    </pre>
-                  )}
+                <div className="px-5 pb-1">
+                  <div className="text-[13px] text-[#86868b]">{topUnread.from_address}</div>
+                  <h2 className="text-[16px] font-semibold text-[#1d1d1f] mt-0.5">
+                    {topUnread.subject}
+                  </h2>
                 </div>
+                {/* Email body preview */}
+                <div className="px-5 pb-4 pt-2">
+                  <div className="border-t border-[#d2d2d7]/30 pt-3">
+                    {topUnread.body_html ? (
+                      <div
+                        className="text-[14px] leading-relaxed text-[#1d1d1f] max-h-[200px] overflow-y-auto prose prose-sm"
+                        dangerouslySetInnerHTML={{ __html: topUnread.body_html }}
+                      />
+                    ) : (
+                      <pre className="text-[14px] leading-relaxed text-[#1d1d1f] whitespace-pre-wrap font-sans max-h-[200px] overflow-y-auto">
+                        {topUnread.body_text || "（无内容）"}
+                      </pre>
+                    )}
+                  </div>
+                </div>
+                {/* Action button */}
+                <div className="px-5 pb-4">
+                  <button
+                    onClick={() => router.push(`/inbox/${topUnread.mailbox_id}`)}
+                    className="w-full py-2 text-[13px] font-medium rounded-xl bg-[#0071e3] text-white hover:bg-[#0066d6] transition-colors"
+                  >
+                    查看收件箱 →
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* Empty state */
+              <div className="px-5 py-10 text-center">
+                <div className="text-[32px] mb-2 opacity-20">📭</div>
+                <p className="text-[14px] text-[#86868b]">暂无邮件</p>
+                <p className="text-[12px] text-[#86868b] mt-1">
+                  等待邮件发送到您的 @t6ios.com 邮箱
+                </p>
               </div>
-              {/* Action button */}
-              <div className="px-5 pb-4">
-                <button
-                  onClick={() => router.push(`/inbox/${topUnread.mailbox_id}`)}
-                  className="w-full py-2 text-[13px] font-medium rounded-xl bg-[#0071e3] text-white hover:bg-[#0066d6] transition-colors"
-                >
-                  查看收件箱 →
-                </button>
-              </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* ===== Generate ===== */}
         <div className="card p-6 mb-6">
